@@ -57,3 +57,20 @@
    ```shell
    docker-compose down -v && docker-compose rm -f -s -v
    ```
+
+## Kubernetes deployment
+
+> It's assumed the openstack-cloud-controller-manager (for Service of LoadBalancer type) and cinder-csi-plugin (for Persistent Volume) are both installed in the Kubernetes cluster.
+
+1. In the `manifests` directory, run `kubectl` command as cluster admin. It will create a new namespace and deploy the blog demo and mysql application. If you have already deployed the StorageClass, delete the `storage.yml` file and modify the `storageClassName` in `mysql.yml`.
+
+   ```shell
+   cd manifests
+   kubectl apply -f .
+   ```
+
+2. For debugging(mysql) purpose, you can create a mysql client pod to connect with mysql service.
+
+   ```shell
+   kubectl run mysqlclient --rm -it --restart=Never --image=mysql:5.7 -- bash
+   ```
