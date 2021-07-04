@@ -1,13 +1,24 @@
+import os
+import sys
+
 from flask import Flask, render_template, request, url_for, flash, redirect
 from oslo_config import cfg
 from oslo_db import options as db_options
+
+topdir = os.path.normpath(
+    os.path.join(os.path.abspath(sys.argv[0]), os.pardir, os.pardir))
+sys.path.insert(0, topdir)
 
 from blog.db import api as db_api
 
 CONF = cfg.CONF
 opt_port = cfg.IntOpt(
     'port',
-    default=5000,
+    default=os.environ.get('PORT', 5000),
+)
+opt_db_conn = cfg.StrOpt(
+    'db-connection',
+    default=os.environ.get('DB_CONNECTION'),
 )
 
 app = Flask(__name__)
@@ -75,14 +86,18 @@ def delete(id):
 
 
 def main():
-    CLI_OPTS = [opt_port]
+    CLI_OPTS = [opt_port, opt_db_conn]
     CONF.register_cli_opts(CLI_OPTS)
-    CONF(args=None, project='blog', validate_default_values=False)
+
+    CONF(args=None, project='blog', validate_default_values=False,
+         default_config_dirs=["/etc/blogdemo"])
+
     db_options.set_defaults(
         CONF,
-        connection="mysql+pymysql://root:zswgwsWzkwdHc11uhovZJ9ExOT8fmVhTu3Dj@10.0.17.9/blog?charset=utf8"
+        connection=CONF.db_connection
     )
     db_api.setup_db()
+
     app.run(host='0.0.0.0', port=CONF.port)
 
 
