@@ -5,8 +5,9 @@ from oslo_db.sqlalchemy import session as db_session
 
 _BACKEND_MAPPING = {
     'sqlalchemy': 'blog.db.sqlalchemy.api',
+    'cosmosdb': 'blog.db.cosmosdb.api'
 }
-IMPL = db_api.DBAPI('sqlalchemy', backend_mapping=_BACKEND_MAPPING)
+IMPL = None
 _FACADE = None
 
 
@@ -28,8 +29,11 @@ def get_engine():
     return facade.get_engine()
 
 
-def setup_db():
-    IMPL.setup_db()
+def setup_db(*args, **kwargs):
+    global IMPL
+    IMPL = db_api.DBAPI(
+        cfg.CONF.database.backend, backend_mapping=_BACKEND_MAPPING)
+    IMPL.setup_db(*args, **kwargs)
 
 
 def model_query(model, columns=()):

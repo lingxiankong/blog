@@ -5,10 +5,24 @@ from oslo_db import options as db_options
 from blog.db import api as db_api
 
 CONF = cfg.CONF
+
 opt_port = cfg.IntOpt(
     'port',
     default=5000,
 )
+CONF.register_cli_opts([opt_port])
+
+opt_cosmos_endpoint = cfg.StrOpt(
+    'endpoint',
+    help='The URI of the Azure Cosmos DB account.'
+)
+opt_cosmos_key = cfg.StrOpt(
+    'key',
+    help='The primary of secondary key of the Azure Cosmos DB account.'
+)
+opt_group_cosmosdb = cfg.OptGroup('cosmosdb', title='Cosmos DB options')
+CONF.register_group(opt_group_cosmosdb)
+CONF.register_opts([opt_cosmos_endpoint, opt_cosmos_key], opt_group_cosmosdb)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your secret key'
@@ -75,13 +89,9 @@ def delete(id):
 
 
 def main():
-    CLI_OPTS = [opt_port]
-    CONF.register_cli_opts(CLI_OPTS)
     CONF(args=None, project='blog', validate_default_values=False)
-    db_options.set_defaults(
-        CONF,
-        connection="mysql+pymysql://root:zswgwsWzkwdHc11uhovZJ9ExOT8fmVhTu3Dj@10.0.17.9/blog?charset=utf8"
-    )
+    db_options.set_defaults(CONF)
+    # Register database config group.
     db_api.setup_db()
     app.run(host='0.0.0.0', port=CONF.port)
 
