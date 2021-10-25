@@ -1,0 +1,13 @@
+resources:
+  - ../../base
+  - namespace.yaml
+  - storage.yaml
+namespace: production
+commonLabels:
+  environment: production
+patchesJson6902:
+- target:
+    version: v1
+    kind: Deployment
+    name: blog
+  path: blog-deploy-change-env.yaml

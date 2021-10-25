@@ -1,0 +1,5 @@
+- op: replace
+  path: /spec/template/spec/containers/0/env/1
+  value:
+    name: DB_CONNECTION
+    value: 'mysql+pymysql://mysql-0.mysql.production/blog?charset=utf8'
