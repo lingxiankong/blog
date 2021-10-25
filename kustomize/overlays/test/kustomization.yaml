@@ -1,0 +1,20 @@
+resources:
+  - ../../base
+  - namespace.yaml
+namespace: test
+commonLabels:
+  environment: test
+patchesStrategicMerge:
+  - blog-service.yaml
+  - mysql-sts.yaml
+patchesJson6902:
+- target:
+    version: v1
+    kind: StatefulSet
+    name: mysql
+  path: mysql-rm-volumeClaimTemplates.yaml
+- target:
+    version: v1
+    kind: Deployment
+    name: blog
+  path: blog-deploy-change-env.yaml
