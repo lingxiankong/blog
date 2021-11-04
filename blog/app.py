@@ -53,6 +53,8 @@ def create():
 
         if not title:
             flash('Title is required!')
+        if not content:
+            flash('Content is required!')
         else:
             db_api.create_post(title, content)
             return redirect(url_for('index'))
