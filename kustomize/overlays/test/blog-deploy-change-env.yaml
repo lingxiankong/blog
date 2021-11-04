@@ -2,4 +2,4 @@
   path: /spec/template/spec/containers/0/env/1
   value:
     name: DB_CONNECTION
-    value: 'mysql+pymysql://mysql-0.mysql.test/blog?charset=utf8'
+    value: 'mysql+pymysql://mysql-0.mysql.blog-test/blog?charset=utf8'
