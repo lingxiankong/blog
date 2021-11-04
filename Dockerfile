@@ -8,10 +8,10 @@ WORKDIR /blog
 RUN pip3 --no-cache-dir install -U -r requirements.txt
 
 ENV PORT=5000
-ENV DB_CONNECTION
+ENV DB_CONNECTION=
+
+RUN mkdir /etc/blog/
+VOLUME /etc/blog/
 
 EXPOSE $PORT
-RUN mkdir /etc/blogdemo/
-VOLUME /etc/blogdemo/
-
 CMD [ "python3", "blog/app.py"]

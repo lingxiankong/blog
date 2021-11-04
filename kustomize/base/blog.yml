@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: blog
-        image: lingxiankong/blog-demo:1.0.0
+        image: docker.io/ACCOUNT/IMAGE:TAG
         imagePullPolicy: IfNotPresent
         env:
         - name: PORT

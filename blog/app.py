@@ -90,7 +90,7 @@ def main():
     CONF.register_cli_opts(CLI_OPTS)
 
     CONF(args=None, project='blog', validate_default_values=False,
-         default_config_dirs=["/etc/blogdemo"])
+         default_config_dirs=["/etc/blog"])
 
     db_options.set_defaults(
         CONF,

@@ -1,7 +1,7 @@
 resources:
   - ../../base
   - namespace.yaml
-namespace: test
+namespace: blog-test
 commonLabels:
   environment: test
 patchesStrategicMerge:

@@ -1,0 +1,55 @@
+name: PR TEST
+
+on: [pull_request]
+
+env:
+  IMAGE_REPO: blog-demo
+  KUBECONFIG_CONTEXT: kubernetes-admin@lingxian-k8s
+
+jobs:
+  image-build-publish-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: |-
+          docker build \
+            --tag "docker.io/${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_REPO:${{github.event.number}}" \
+            .
+
+      - name: Docker Login
+        uses: docker/login-action@v1.10.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Publish
+        run: |-
+          docker push "docker.io/${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_REPO:${{github.event.number}}"
+
+      - name: Kubernetes set context
+        uses: Azure/k8s-set-context@v1.1
+        with:
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          context: "${{ env.KUBECONFIG_CONTEXT }}"
+
+      - name: Kubectl tool installer
+        uses: Azure/setup-kubectl@v1
+        with:
+          version: v1.22.0
+
+      - name: Set up Kustomize
+        run: |-
+          curl -SL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.4.0/kustomize_v4.4.0_linux_amd64.tar.gz -o /tmp/kustomize.tar.gz
+          tar -xzvf /tmp/kustomize.tar.gz -C /tmp/
+          chmod u+x /tmp/kustomize
+          sudo mv /tmp/kustomize /usr/local/bin/kustomize
+
+      - name: Deploy
+        run: |-
+          cd kustomize/overlays/test
+          kustomize edit set image docker.io/ACCOUNT/IMAGE:TAG=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_REPO:${{github.event.number}}
+          kustomize build . | kubectl apply -f -
